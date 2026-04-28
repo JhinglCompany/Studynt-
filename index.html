@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Studynt | App de Estudos</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -19,7 +19,7 @@
             --bg-body: #082f49; --bg-card: #0c4a6e; --bg-input: #075985;
             --text-main: #f0f9ff; --text-muted: #7dd3fc; --border-color: #0ea5e9; --nav-bg: #0c4a6e;
         }
-        body { background-color: var(--bg-body); color: var(--text-main); transition: all 0.3s ease; min-height: 100vh; overflow-x: hidden; }
+        body { background-color: var(--bg-body); color: var(--text-main); transition: all 0.3s ease; min-height: 100vh; overflow-x: hidden; width: 100%; }
         .custom-card { background-color: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); }
         .custom-nav { background-color: var(--nav-bg); border-bottom: 1px solid var(--border-color); }
         .custom-input { background-color: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); }
@@ -27,7 +27,6 @@
         .menu-dropdown.open { display: block; }
         .tab-active { border-bottom: 3px solid #3b82f6; color: #3b82f6; font-weight: 800; }
         
-        /* Blur do Bloqueio */
         #app-content.blur-lock { filter: blur(25px); pointer-events: none; user-select: none; opacity: 0.1; }
         
         .confirm-popup { transform: scale(0.9); opacity: 0; transition: all 0.2s ease; pointer-events: none; }
@@ -44,152 +43,179 @@
 </head>
 <body id="body-app">
 
-    <div id="lock-screen" class="fixed inset-0 z-[500] bg-slate-900 flex-col items-center justify-center text-white hidden transition-opacity">
+    <div id="lock-screen" class="fixed inset-0 z-[500] bg-slate-900 flex-col items-center justify-center text-white hidden transition-opacity w-full">
         <div class="w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(37,99,235,0.5)]">
             <i class="fas fa-lock text-4xl"></i>
         </div>
-        <h2 class="text-3xl font-black mb-2">Studynt Bloqueado</h2>
-        <p class="text-slate-400 mb-8">Digite sua senha para acessar.</p>
+        <h2 class="text-3xl font-black mb-2 text-center px-4 break-words">Studynt Bloqueado</h2>
+        <p class="text-slate-400 mb-8 text-center px-4">Digite sua senha para acessar.</p>
         <button onclick="desbloquearApp()" class="bg-white text-slate-900 px-8 py-4 rounded-full font-black text-lg hover:scale-105 transition shadow-xl">
             <i class="fas fa-key mr-2"></i> DESBLOQUEAR
         </button>
     </div>
 
     <div id="pin-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[600] hidden items-center justify-center p-4">
-        <div class="bg-white text-slate-900 w-full max-w-sm rounded-3xl p-8 text-center shadow-2xl">
+        <div class="bg-white text-slate-900 w-full max-w-[90vw] sm:max-w-sm rounded-3xl p-6 sm:p-8 text-center shadow-2xl">
             <i class="fas fa-shield-alt text-4xl text-blue-600 mb-4"></i>
-            <h3 id="pin-title" class="text-2xl font-black mb-2">Senha</h3>
+            <h3 id="pin-title" class="text-2xl font-black mb-2 break-words">Senha</h3>
             <p id="pin-desc" class="text-sm text-slate-500 mb-6">Confirme sua identidade.</p>
-            <input type="password" id="pin-input" class="w-full text-center text-3xl tracking-[0.4em] font-black p-4 bg-slate-100 rounded-2xl mb-6 outline-none focus:ring-4 ring-blue-500/30 transition" placeholder="••••">
-            <div class="flex gap-3">
-                <button onclick="fecharPin()" id="btn-cancel-pin" class="flex-1 py-4 rounded-xl font-bold bg-slate-200 hover:bg-slate-300 transition hidden">Cancelar</button>
-                <button onclick="processarPin()" class="flex-1 py-4 rounded-xl font-bold bg-blue-600 text-white hover:bg-blue-700 transition shadow-lg">Confirmar</button>
+            <input type="password" id="pin-input" class="w-full text-center text-3xl tracking-[0.4em] font-black p-4 bg-slate-100 rounded-2xl mb-6 outline-none focus:ring-4 ring-blue-500/30 transition text-slate-900 min-w-0" placeholder="••••">
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button onclick="fecharPin()" id="btn-cancel-pin" class="flex-1 py-4 rounded-xl font-bold bg-slate-200 text-slate-800 hover:bg-slate-300 transition hidden w-full">Cancelar</button>
+                <button onclick="processarPin()" class="flex-1 py-4 rounded-xl font-bold bg-blue-600 text-white hover:bg-blue-700 transition shadow-lg w-full">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="input-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[600] hidden items-center justify-center p-4">
+        <div class="custom-card w-full max-w-[90vw] sm:max-w-sm rounded-3xl p-6 sm:p-8 text-center shadow-2xl">
+            <h3 id="custom-input-title" class="text-xl sm:text-2xl font-black mb-6 break-words">Novo Item</h3>
+            <input type="text" id="custom-input-field" class="w-full text-lg font-bold p-4 bg-slate-100 rounded-2xl mb-6 outline-none focus:ring-4 ring-blue-500/30 transition text-slate-900 min-w-0" placeholder="Digite o nome...">
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button onclick="fecharInputModal()" class="flex-1 py-4 rounded-xl font-bold bg-slate-200 text-slate-800 hover:bg-slate-300 transition w-full">Cancelar</button>
+                <button onclick="confirmarInputModal()" class="flex-1 py-4 rounded-xl font-bold bg-blue-600 text-white hover:bg-blue-700 transition shadow-lg w-full">Salvar</button>
             </div>
         </div>
     </div>
 
     <div id="confirm-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200] hidden items-center justify-center p-4">
-        <div id="confirm-box" class="confirm-popup custom-card w-full max-w-sm rounded-3xl p-8 text-center shadow-2xl">
-            <div class="w-20 h-20 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+        <div id="confirm-box" class="confirm-popup custom-card w-full max-w-[90vw] sm:max-w-sm rounded-3xl p-6 sm:p-8 text-center shadow-2xl">
+            <div class="w-16 h-16 sm:w-20 sm:h-20 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
                 <i class="fas fa-exclamation-triangle"></i>
             </div>
-            <h3 class="text-2xl font-black mb-2">Tem certeza?</h3>
+            <h3 class="text-xl sm:text-2xl font-black mb-2 break-words">Tem certeza?</h3>
             <p class="text-sm opacity-70 mb-8" id="confirm-text">Isso apagará este item permanentemente.</p>
-            <div class="flex gap-3">
-                <button onclick="cancelarExclusao()" class="flex-1 py-4 rounded-xl font-bold bg-slate-200 text-slate-800 hover:bg-slate-300 transition">Cancelar</button>
-                <button id="btn-confirmar-acao" class="flex-1 py-4 rounded-xl font-bold bg-red-600 text-white hover:bg-red-700 shadow-lg transition">Excluir</button>
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button onclick="cancelarExclusao()" class="flex-1 py-4 rounded-xl font-bold bg-slate-200 text-slate-800 hover:bg-slate-300 transition w-full">Cancelar</button>
+                <button id="btn-confirmar-acao" class="flex-1 py-4 rounded-xl font-bold bg-red-600 text-white hover:bg-red-700 shadow-lg transition w-full">Excluir</button>
             </div>
         </div>
     </div>
 
-    <button onclick="abrirSetupQuiz()" class="fab-quiz fixed bottom-6 right-6 md:bottom-10 md:right-10 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4 rounded-full shadow-2xl hover:scale-105 transition-transform z-50 flex items-center gap-3 font-black border-4 border-white/20">
-        <i class="fas fa-gamepad text-2xl"></i> <span class="tracking-widest hidden sm:inline">MODO QUIZ</span>
+    <button onclick="abrirSetupQuiz()" class="fab-quiz fixed bottom-6 right-6 md:bottom-10 md:right-10 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-5 sm:px-6 py-4 rounded-full shadow-2xl hover:scale-105 transition-transform z-50 flex items-center gap-3 font-black border-4 border-white/20">
+        <i class="fas fa-gamepad text-xl sm:text-2xl"></i> <span class="tracking-widest hidden sm:inline">MODO QUIZ</span>
     </button>
 
-    <div id="app-content" class="blur-lock transition-all duration-700 pb-32">
-        <nav class="custom-nav sticky top-0 z-50 h-16 shadow-sm">
-            <div class="max-w-7xl mx-auto px-3 sm:px-4 h-full flex items-center justify-between gap-1">
+    <div id="app-content" class="blur-lock transition-all duration-700 pb-32 w-full overflow-hidden">
+        <nav class="custom-nav sticky top-0 z-50 h-16 shadow-sm w-full">
+            <div class="max-w-7xl mx-auto px-3 sm:px-4 h-full flex items-center justify-between gap-1 w-full">
                 
-                <div class="flex items-center gap-2 flex-shrink-0 cursor-pointer" onclick="irParaCadernos()">
-                    <div class="bg-blue-600 p-1.5 sm:p-2 rounded-lg text-white flex items-center justify-center">
+                <div class="flex items-center gap-2 flex-shrink-0 cursor-pointer min-w-0" onclick="irParaCadernos()">
+                    <div class="bg-blue-600 p-1.5 sm:p-2 rounded-lg text-white flex items-center justify-center flex-shrink-0">
                         <i class="fas fa-graduation-cap"></i>
                     </div>
-                    <span class="text-xl sm:text-2xl font-black italic tracking-tight">Stud<span class="text-blue-500">ynt</span></span>
+                    <span class="text-lg sm:text-2xl font-black italic tracking-tight truncate">Stud<span class="text-blue-500">ynt</span></span>
                 </div>
                 
                 <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-                    <button id="nav-add-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl text-[10px] sm:text-sm font-black shadow-lg transition-all active:scale-95 flex items-center gap-2">
-                        <i class="fas fa-plus"></i> <span id="nav-add-text">Criar Caderno</span>
+                    <button id="nav-add-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl text-[10px] sm:text-sm font-black shadow-lg transition-all active:scale-95 flex items-center gap-2 max-w-[120px] sm:max-w-none truncate">
+                        <i class="fas fa-plus flex-shrink-0"></i> <span id="nav-add-text" class="truncate">Criar Caderno</span>
                     </button>
                     
-                    <div class="relative">
-                        <button onclick="toggleConfig()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-500/20 transition-colors"><i class="fas fa-cog text-xl"></i></button>
-                        <div id="config-menu" class="menu-dropdown absolute right-0 mt-2 w-64 rounded-2xl shadow-2xl p-3 z-[60]">
-                            
+                    <div class="relative flex-shrink-0">
+                        <button onclick="toggleConfig()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-500/20 transition-colors"><i class="fas fa-cog text-lg sm:text-xl"></i></button>
+                        <div id="config-menu" class="menu-dropdown absolute right-0 mt-2 w-56 sm:w-64 rounded-2xl shadow-2xl p-3 z-[60] max-w-[90vw]">
                             <div class="px-3 py-2 text-[10px] font-black opacity-50 uppercase tracking-widest">Segurança</div>
                             <div id="lock-menu-container"></div>
-                            
-                            <div class="h-[1px] bg-current opacity-10 my-3"></div>
-                            
+                            <div class="h-[1px] bg-current opacity-10 my-2 sm:my-3"></div>
                             <div class="px-3 py-2 text-[10px] font-black opacity-50 uppercase tracking-widest">Visual</div>
-                            <button onclick="setTheme('light')" class="w-full text-left px-3 py-2.5 text-sm hover:bg-blue-500/10 rounded-xl flex items-center gap-3 font-bold"><i class="fas fa-sun text-yellow-500 w-5"></i> Claro</button>
-                            <button onclick="setTheme('dark')" class="w-full text-left px-3 py-2.5 text-sm hover:bg-blue-500/10 rounded-xl flex items-center gap-3 font-bold"><i class="fas fa-moon text-indigo-400 w-5"></i> Escuro</button>
-                            <button onclick="setTheme('ocean')" class="w-full text-left px-3 py-2.5 text-sm hover:bg-blue-500/10 rounded-xl flex items-center gap-3 font-bold"><i class="fas fa-water text-blue-400 w-5"></i> Oceano</button>
-                            
-                            <div class="h-[1px] bg-current opacity-10 my-3"></div>
-                            
+                            <button onclick="setTheme('light')" class="w-full text-left px-3 py-2 sm:py-2.5 text-sm hover:bg-blue-500/10 rounded-xl flex items-center gap-3 font-bold"><i class="fas fa-sun text-yellow-500 w-5"></i> Claro</button>
+                            <button onclick="setTheme('dark')" class="w-full text-left px-3 py-2 sm:py-2.5 text-sm hover:bg-blue-500/10 rounded-xl flex items-center gap-3 font-bold"><i class="fas fa-moon text-indigo-400 w-5"></i> Escuro</button>
+                            <button onclick="setTheme('ocean')" class="w-full text-left px-3 py-2 sm:py-2.5 text-sm hover:bg-blue-500/10 rounded-xl flex items-center gap-3 font-bold"><i class="fas fa-water text-blue-400 w-5"></i> Oceano</button>
+                            <div class="h-[1px] bg-current opacity-10 my-2 sm:my-3"></div>
                             <div class="px-3 py-2 text-[10px] font-black opacity-50 uppercase tracking-widest">Dados</div>
-                            <button onclick="exportarTudo()" class="w-full text-left px-3 py-2.5 text-sm text-blue-500 hover:bg-blue-500/10 rounded-xl flex items-center gap-3 font-black"><i class="fas fa-download w-5"></i> Exportar Dados</button>
-                            <label class="w-full text-left px-3 py-2.5 text-sm text-emerald-500 hover:bg-emerald-500/10 rounded-xl flex items-center gap-3 font-black cursor-pointer"><i class="fas fa-upload w-5"></i> Importar<input type="file" class="hidden" accept=".json" onchange="importarSmart(event)"></label>
+                            <button onclick="exportarTudo()" class="w-full text-left px-3 py-2 sm:py-2.5 text-sm text-blue-500 hover:bg-blue-500/10 rounded-xl flex items-center gap-3 font-black"><i class="fas fa-download w-5"></i> Exportar Dados</button>
+                            <label class="w-full text-left px-3 py-2 sm:py-2.5 text-sm text-emerald-500 hover:bg-emerald-500/10 rounded-xl flex items-center gap-3 font-black cursor-pointer"><i class="fas fa-upload w-5"></i> Importar (Somar)<input type="file" class="hidden" accept=".json" onchange="importarSmart(event)"></label>
                         </div>
                     </div>
                 </div>
             </div>
         </nav>
 
-        <main class="max-w-7xl mx-auto p-4 md:p-8">
-            <div id="view-header" class="mb-8 flex items-center gap-4"></div>
-            <div id="main-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        <main class="w-full max-w-7xl mx-auto p-4 md:p-8">
+            <div id="view-header" class="mb-6 sm:mb-8 flex items-center gap-3 sm:gap-4 min-w-0 w-full"></div>
+            <div id="main-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full"></div>
         </main>
     </div>
 
     <div id="modal-setup-quiz" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4 z-[150]">
-        <div class="custom-card rounded-3xl w-full max-w-lg p-8 shadow-2xl text-center relative overflow-hidden">
+        <div class="custom-card rounded-3xl w-full max-w-[95vw] sm:max-w-lg p-6 sm:p-8 text-center relative overflow-hidden">
             <button onclick="fecharSetupQuiz()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-500/20 transition"><i class="fas fa-times"></i></button>
-            <i class="fas fa-brain text-6xl text-blue-500 mb-4"></i><h2 class="text-3xl font-black mb-2">Configure seu Quiz</h2>
+            <i class="fas fa-brain text-5xl sm:text-6xl text-blue-500 mb-4"></i><h2 class="text-2xl sm:text-3xl font-black mb-2 break-words">Configure seu Quiz</h2>
             <div class="space-y-4 text-left mt-6">
-                <div><label class="text-[10px] font-black uppercase opacity-60 ml-2">Caderno</label><select id="select-q-caderno" onchange="atualizarFiltrosQuiz(1)" class="custom-input w-full p-4 rounded-xl font-bold outline-none border-2 focus:border-blue-500 transition"></select></div>
-                <div><label class="text-[10px] font-black uppercase opacity-60 ml-2">Disciplina</label><select id="select-q-disciplina" onchange="atualizarFiltrosQuiz(2)" class="custom-input w-full p-4 rounded-xl font-bold outline-none border-2 focus:border-blue-500 transition disabled:opacity-50"></select></div>
-                <div><label class="text-[10px] font-black uppercase opacity-60 ml-2">Unidade</label><select id="select-q-unidade" class="custom-input w-full p-4 rounded-xl font-bold outline-none border-2 focus:border-blue-500 transition disabled:opacity-50"></select></div>
+                <div><label class="text-[10px] font-black uppercase opacity-60 ml-2">Caderno</label><select id="select-q-caderno" onchange="atualizarFiltrosQuiz(1)" class="custom-input w-full p-4 rounded-xl font-bold outline-none border-2 focus:border-blue-500 transition min-w-0"></select></div>
+                <div><label class="text-[10px] font-black uppercase opacity-60 ml-2">Disciplina</label><select id="select-q-disciplina" onchange="atualizarFiltrosQuiz(2)" class="custom-input w-full p-4 rounded-xl font-bold outline-none border-2 focus:border-blue-500 transition disabled:opacity-50 min-w-0"></select></div>
+                <div><label class="text-[10px] font-black uppercase opacity-60 ml-2">Unidade</label><select id="select-q-unidade" class="custom-input w-full p-4 rounded-xl font-bold outline-none border-2 focus:border-blue-500 transition disabled:opacity-50 min-w-0"></select></div>
             </div>
             <button onclick="iniciarQuiz()" class="w-full mt-8 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-4 rounded-xl text-lg shadow-xl hover:scale-[1.02] transition-all">COMEÇAR QUIZ</button>
         </div>
     </div>
 
-    <div id="modal-play-quiz" class="fixed inset-0 bg-slate-900 hidden flex-col z-[200]">
-        <div class="h-16 border-b border-white/10 flex items-center justify-between px-6 bg-slate-800 text-white">
+    <div id="modal-play-quiz" class="fixed inset-0 bg-slate-900 hidden flex-col z-[200] w-full">
+        <div class="h-16 border-b border-white/10 flex items-center justify-between px-4 sm:px-6 bg-slate-800 text-white flex-shrink-0 w-full">
             <button onclick="fecharPlayQuiz()" class="text-slate-400 hover:text-white transition flex items-center gap-2 font-bold"><i class="fas fa-arrow-left"></i> Sair</button>
-            <div class="font-black tracking-widest text-blue-400" id="quiz-progress-text">0 / 0</div><div class="w-16"></div>
+            <div class="font-black tracking-widest text-blue-400 text-sm sm:text-base" id="quiz-progress-text">0 / 0</div><div class="w-12 sm:w-16"></div>
         </div>
-        <div class="h-1 bg-slate-700 w-full"><div id="quiz-progress-bar" class="h-full bg-blue-500 transition-all duration-300 w-0"></div></div>
-        <div class="flex-1 overflow-y-auto p-4 flex flex-col items-center justify-center bg-slate-900 text-white">
+        <div class="h-1 bg-slate-700 w-full flex-shrink-0"><div id="quiz-progress-bar" class="h-full bg-blue-500 transition-all duration-300 w-0"></div></div>
+        <div class="flex-1 overflow-y-auto p-4 flex flex-col items-center justify-center bg-slate-900 text-white w-full">
             <div class="w-full max-w-3xl">
-                <p id="quiz-source" class="text-xs font-bold text-blue-400 uppercase tracking-widest mb-4 text-center"></p>
-                <div class="bg-slate-800 p-8 rounded-3xl border border-white/5 mb-8"><h2 id="quiz-pergunta" class="text-2xl md:text-3xl font-bold text-center"></h2></div>
-                <div id="quiz-opcoes" class="grid grid-cols-1 gap-4"></div>
-                <div id="quiz-feedback-container" class="mt-8 text-center hidden"><p id="quiz-feedback-msg" class="text-xl font-black mb-4"></p><button onclick="proximaQuestaoQuiz()" class="bg-white text-slate-900 font-black py-4 px-12 rounded-full text-lg shadow-xl">PRÓXIMA <i class="fas fa-arrow-right ml-2"></i></button></div>
+                <p id="quiz-source" class="text-[10px] sm:text-xs font-bold text-blue-400 uppercase tracking-widest mb-4 text-center break-words"></p>
+                <div class="bg-slate-800 p-6 sm:p-8 rounded-3xl border border-white/5 mb-6 sm:mb-8"><h2 id="quiz-pergunta" class="text-xl sm:text-2xl md:text-3xl font-bold text-center break-words"></h2></div>
+                <div id="quiz-opcoes" class="grid grid-cols-1 gap-3 sm:gap-4 w-full"></div>
+                <div id="quiz-feedback-container" class="mt-6 sm:mt-8 text-center hidden w-full">
+                    <p id="quiz-feedback-msg" class="text-lg sm:text-xl font-black mb-4 break-words"></p>
+                    <button onclick="proximaQuestaoQuiz()" class="bg-white text-slate-900 font-black py-3 sm:py-4 px-8 sm:px-12 rounded-full text-base sm:text-lg shadow-xl w-full sm:w-auto">PRÓXIMA <i class="fas fa-arrow-right ml-2"></i></button>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="modal-result-quiz" class="fixed inset-0 bg-slate-900/95 hidden items-center justify-center p-4 z-[210] text-white">
-        <div class="bg-slate-800 rounded-3xl w-full max-w-md p-10 text-center shadow-2xl border border-white/10">
-            <div id="result-icon" class="text-7xl mb-6">🏆</div><h2 class="text-4xl font-black mb-2">Fim do Quiz!</h2>
-            <div class="bg-slate-900 rounded-2xl p-6 mb-8 mt-6 border border-white/5">
-                <div class="text-6xl font-black text-blue-400" id="result-score">0%</div><div class="text-sm font-bold text-slate-500 mt-2" id="result-text">0 de 0 corretas</div>
+        <div class="bg-slate-800 rounded-3xl w-full max-w-[95vw] sm:max-w-md p-8 sm:p-10 text-center shadow-2xl border border-white/10">
+            <div id="result-icon" class="text-6xl sm:text-7xl mb-6">🏆</div><h2 class="text-3xl sm:text-4xl font-black mb-2 break-words">Fim do Quiz!</h2>
+            <div class="bg-slate-900 rounded-2xl p-6 mb-8 mt-6 border border-white/5 w-full">
+                <div class="text-5xl sm:text-6xl font-black text-blue-400 truncate" id="result-score">0%</div><div class="text-sm font-bold text-slate-500 mt-2 truncate" id="result-text">0 de 0 corretas</div>
             </div>
             <button onclick="fecharResultQuiz()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-xl text-lg transition-all">VOLTAR AO APP</button>
         </div>
     </div>
 
     <div id="modal-questoes" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden items-center justify-center p-2 sm:p-4 z-[100]">
-        <div class="custom-card rounded-3xl w-full max-w-4xl max-h-[95vh] overflow-hidden flex flex-col shadow-2xl">
-            <div class="px-6 pt-6 border-b border-inherit">
-                <div class="flex justify-between items-start mb-4">
-                    <div><h3 id="modal-title" class="text-xl sm:text-2xl font-black">Unidade</h3><p id="modal-subtitle" class="text-xs text-blue-500 font-bold uppercase tracking-widest"></p></div>
-                    <button onclick="fecharModalQuestoes()" class="w-10 h-10 rounded-full hover:bg-red-500/20 text-inherit transition"><i class="fas fa-times"></i></button>
+        <div class="custom-card rounded-3xl w-full max-w-[98vw] sm:max-w-4xl max-h-[95vh] overflow-hidden flex flex-col shadow-2xl">
+            <div class="px-4 sm:px-6 pt-4 sm:pt-6 border-b border-inherit flex-shrink-0">
+                <div class="flex justify-between items-start mb-4 gap-2">
+                    <div class="min-w-0 flex-1">
+                        <h3 id="modal-title" class="text-xl sm:text-2xl font-black truncate">Unidade</h3>
+                        <p id="modal-subtitle" class="text-[10px] sm:text-xs text-blue-500 font-bold uppercase tracking-widest truncate"></p>
+                    </div>
+                    <button onclick="fecharModalQuestoes()" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full hover:bg-red-500/20 text-inherit transition flex-shrink-0"><i class="fas fa-times"></i></button>
                 </div>
-                <div class="flex gap-8"><button onclick="setTab('questoes')" id="tab-questoes" class="pb-3 text-sm font-bold transition-all tab-active">QUESTÕES</button><button onclick="setTab('anotacoes')" id="tab-anotacoes" class="pb-3 text-sm font-bold transition-all opacity-50">ANOTAÇÕES</button></div>
+                <div class="flex gap-4 sm:gap-8 overflow-x-auto whitespace-nowrap">
+                    <button onclick="setTab('questoes')" id="tab-questoes" class="pb-3 text-xs sm:text-sm font-bold transition-all tab-active flex-shrink-0">QUESTÕES</button>
+                    <button onclick="setTab('anotacoes')" id="tab-anotacoes" class="pb-3 text-xs sm:text-sm font-bold transition-all opacity-50 flex-shrink-0">ANOTAÇÕES</button>
+                </div>
             </div>
-            <div class="flex-1 overflow-y-auto p-4 sm:p-6">
-                <div id="aba-questoes-content" class="space-y-6"></div>
-                <div id="aba-anotacoes-content" class="hidden h-full"><textarea id="texto-anotacoes" oninput="salvarAnotacaoDirect()" placeholder="Escreva seus resumos aqui..." class="custom-input w-full h-full min-h-[400px] p-6 rounded-2xl text-lg outline-none transition-all border-dashed"></textarea></div>
+            <div class="flex-1 overflow-y-auto p-3 sm:p-6 w-full">
+                <div id="aba-questoes-content" class="space-y-4 sm:space-y-6 w-full"></div>
+                <div id="aba-anotacoes-content" class="hidden h-full w-full">
+                    <textarea id="texto-anotacoes" oninput="salvarAnotacaoDirect()" placeholder="Escreva seus resumos aqui..." class="custom-input w-full h-full min-h-[400px] p-4 sm:p-6 rounded-2xl text-base sm:text-lg outline-none transition-all border-dashed resize-none"></textarea>
+                </div>
             </div>
-            <div id="footer-modal" class="p-4 sm:p-6 border-t border-inherit flex gap-3"><button onclick="adicionarQuestao()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-black py-3 sm:py-4 rounded-2xl shadow-lg">+ ADICIONAR QUESTÃO</button></div>
+            <div id="footer-modal" class="p-4 sm:p-6 border-t border-inherit flex gap-3 flex-shrink-0 w-full">
+                <button onclick="adicionarQuestao()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-black py-3 sm:py-4 rounded-2xl shadow-lg text-sm sm:text-base">+ ADICIONAR QUESTÃO</button>
+            </div>
         </div>
     </div>
 
-    <div id="modal-cores" class="fixed inset-0 bg-black/70 hidden items-center justify-center p-4 z-[120]"><div class="custom-card rounded-2xl w-full max-w-md p-6 shadow-2xl"><div class="flex justify-between items-center mb-6"><h3 class="text-lg font-black">Cor do Caderno</h3><button onclick="document.getElementById('modal-cores').style.display='none'" class="opacity-50 hover:opacity-100"><i class="fas fa-times"></i></button></div><div id="palette-grid" class="grid grid-cols-8 gap-2"></div></div></div>
+    <div id="modal-cores" class="fixed inset-0 bg-black/70 hidden items-center justify-center p-4 z-[120]">
+        <div class="custom-card rounded-3xl w-full max-w-[95vw] sm:max-w-md p-6 shadow-2xl text-center">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-black truncate">Cor do Caderno</h3>
+                <button onclick="document.getElementById('modal-cores').style.display='none'" class="opacity-50 hover:opacity-100 flex-shrink-0"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="palette-grid" class="grid grid-cols-6 sm:grid-cols-8 gap-2 w-full justify-items-center"></div>
+        </div>
+    </div>
 
     <script>
         // --- ESTADOS GLOBAIS ---
@@ -198,12 +224,20 @@
         let activeIds = { cId: null, dId: null, uId: null }; 
         let activeTab = 'questoes'; let deleteQueue = null; let pinCallback = null; let activeColorTarget = null;
         let currentQuizData = []; let activeQuizIndex = 0; let scoreQuiz = 0;
+        let customInputCallback = null; 
+
+        // 32 Cores Otimizadas para não vazar a tela
         const CORES = ['#ef4444','#f97316','#f59e0b','#10b981','#22c55e','#06b6d4','#3b82f6','#6366f1','#8b5cf6','#ec4899','#f472b6','#64748b','#0f172a','#dc2626','#ea580c','#d97706','#059669','#16a34a','#0891b2','#2563eb','#4f46e5','#7c3aed','#db2777','#475569','#42a5f5','#66bb6a','#ffca28','#ab47bc','#26a69a','#5c6bc0','#ef5350','#78909c'];
 
         window.onload = () => {
             const data = localStorage.getItem('studyflow_db'); if (data) db = JSON.parse(data);
             setTheme(localStorage.getItem('studyflow_theme') || 'light');
-            document.getElementById('palette-grid').innerHTML = CORES.map(cor => `<div class="w-full aspect-square rounded-lg cursor-pointer border border-black/10 transition hover:scale-110" style="background-color:${cor}" onclick="aplicarCor('${cor}')"></div>`).join('');
+            document.getElementById('palette-grid').innerHTML = CORES.map(cor => `<div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg cursor-pointer border border-black/10 transition hover:scale-110 flex-shrink-0" style="background-color:${cor}" onclick="aplicarCor('${cor}')"></div>`).join('');
+            
+            document.getElementById('custom-input-field').addEventListener('keydown', function(e) {
+                if(e.key === 'Enter') confirmarInputModal();
+            });
+
             verificarBloqueioInicial();
             render();
         };
@@ -212,13 +246,27 @@
         function setTheme(t) { document.getElementById('body-app').className = t==='light'?'':`theme-${t}`; localStorage.setItem('studyflow_theme', t); document.getElementById('config-menu').classList.remove('open');}
         function toggleConfig() { document.getElementById('config-menu').classList.toggle('open'); }
 
+        // --- SISTEMA DO MODAL DE INPUT ---
+        function abrirInputModal(titulo, placeholder, valorAtual, callback) {
+            document.getElementById('custom-input-title').innerText = titulo;
+            const inputField = document.getElementById('custom-input-field');
+            inputField.placeholder = placeholder;
+            inputField.value = valorAtual || '';
+            document.getElementById('input-modal').classList.remove('hidden');
+            document.getElementById('input-modal').classList.add('flex');
+            inputField.focus();
+            customInputCallback = callback;
+        }
+        function fecharInputModal() { document.getElementById('input-modal').classList.add('hidden'); document.getElementById('input-modal').classList.remove('flex'); customInputCallback = null; }
+        function confirmarInputModal() { const val = document.getElementById('custom-input-field').value; if (customInputCallback) customInputCallback(val); fecharInputModal(); }
+
         // --- NAVEGAÇÃO ---
         function irParaCadernos() { viewState = 'cadernos'; activeIds.cId = null; activeIds.dId = null; render(); }
         function abrirCaderno(cId) { activeIds.cId = cId; viewState = 'disciplinas'; render(); }
         function abrirDisciplina(dId) { activeIds.dId = dId; viewState = 'unidades'; render(); }
         function voltarView() { if (viewState === 'unidades') viewState = 'disciplinas'; else if (viewState === 'disciplinas') viewState = 'cadernos'; render(); }
 
-        // --- RENDERIZAÇÃO CENTRAL ---
+        // --- RENDERIZAÇÃO CENTRAL COM QUEBRA FORÇADA ---
         function render() {
             const grid = document.getElementById('main-grid');
             const header = document.getElementById('view-header');
@@ -226,25 +274,24 @@
             const navText = document.getElementById('nav-add-text');
 
             if (viewState === 'cadernos') {
-                header.innerHTML = `<h2 class="text-3xl font-black tracking-tight">Meus Cadernos</h2>`;
+                header.innerHTML = `<h2 class="text-2xl sm:text-3xl font-black tracking-tight truncate w-full">Meus Cadernos</h2>`;
                 navText.innerText = "Criar Caderno";
                 navBtn.onclick = criarCaderno;
                 
                 if (db.cadernos.length === 0) {
-                    grid.innerHTML = `<div class="col-span-full py-20 text-center opacity-40"><i class="fas fa-book-open text-6xl mb-4"></i><h3 class="text-xl font-bold">Nenhum caderno criado.</h3><p>Clique em Criar Caderno para começar.</p></div>`;
-                    return;
+                    grid.innerHTML = `<div class="col-span-full py-20 text-center opacity-40"><i class="fas fa-book-open text-6xl mb-4"></i><h3 class="text-xl font-bold">Nenhum caderno criado.</h3><p>Clique em Criar Caderno para começar.</p></div>`; return;
                 }
 
                 grid.innerHTML = db.cadernos.map(c => `
-                    <div onclick="abrirCaderno(${c.id})" class="drill-card custom-card rounded-[2rem] overflow-hidden flex flex-col shadow-lg border-t-[8px] h-48 relative" style="border-top-color: ${c.cor || '#3b82f6'}">
-                        <div class="flex-1 p-6 flex flex-col justify-center">
-                            <h3 class="font-black text-2xl break-words line-clamp-3 leading-tight" title="${c.nome}">${c.nome}</h3>
-                            <span class="text-[10px] font-black uppercase tracking-widest mt-3" style="color: ${c.cor || '#3b82f6'}">${c.disciplinas.length} DISCIPLINAS</span>
+                    <div onclick="abrirCaderno(${c.id})" class="drill-card custom-card rounded-[2rem] overflow-hidden flex flex-col shadow-lg border-t-[8px] h-48 relative w-full" style="border-top-color: ${c.cor || '#3b82f6'}">
+                        <div class="flex-1 p-5 sm:p-6 flex flex-col justify-center min-w-0">
+                            <h3 class="font-black text-xl sm:text-2xl break-words line-clamp-3 leading-tight" title="${c.nome}">${c.nome}</h3>
+                            <span class="text-[10px] font-black uppercase tracking-widest mt-3 truncate" style="color: ${c.cor || '#3b82f6'}">${c.disciplinas.length} DISCIPLINAS</span>
                         </div>
-                        <div class="absolute top-4 right-4 flex gap-2">
-                            <button onclick="event.stopPropagation(); renomearItem('caderno', ${c.id})" class="w-8 h-8 rounded-full bg-black/5 hover:bg-blue-500/20 text-inherit flex items-center justify-center transition" title="Renomear"><i class="fas fa-edit text-xs"></i></button>
-                            <button onclick="event.stopPropagation(); activeColorTarget=${c.id}; document.getElementById('modal-cores').style.display='flex';" class="w-8 h-8 rounded-full bg-black/5 hover:bg-blue-500/20 text-inherit flex items-center justify-center transition" title="Cor"><i class="fas fa-palette text-xs"></i></button>
-                            <button onclick="event.stopPropagation(); solicitarExclusao('caderno', ${c.id})" class="w-8 h-8 rounded-full bg-black/5 hover:bg-red-500/20 text-red-500 flex items-center justify-center transition" title="Excluir"><i class="fas fa-trash text-xs"></i></button>
+                        <div class="absolute top-3 right-3 flex gap-1 sm:gap-2">
+                            <button onclick="event.stopPropagation(); renomearItem('caderno', ${c.id})" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black/5 hover:bg-blue-500/20 text-inherit flex items-center justify-center transition" title="Renomear"><i class="fas fa-edit text-xs"></i></button>
+                            <button onclick="event.stopPropagation(); activeColorTarget=${c.id}; document.getElementById('modal-cores').style.display='flex';" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black/5 hover:bg-blue-500/20 text-inherit flex items-center justify-center transition" title="Cor"><i class="fas fa-palette text-xs"></i></button>
+                            <button onclick="event.stopPropagation(); solicitarExclusao('caderno', ${c.id})" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black/5 hover:bg-red-500/20 text-red-500 flex items-center justify-center transition" title="Excluir"><i class="fas fa-trash text-xs"></i></button>
                         </div>
                     </div>
                 `).join('');
@@ -254,27 +301,29 @@
                 if(!c) return irParaCadernos();
 
                 header.innerHTML = `
-                    <button onclick="voltarView()" class="w-12 h-12 rounded-full bg-black/5 hover:bg-blue-500/10 flex items-center justify-center transition text-xl flex-shrink-0"><i class="fas fa-arrow-left"></i></button>
-                    <div class="flex-1">
-                        <span class="text-[10px] font-black uppercase tracking-widest opacity-50">Caderno</span>
-                        <h2 class="text-2xl md:text-3xl font-black flex items-center gap-3 truncate" title="${c.nome}"><span class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: ${c.cor || '#3b82f6'}"></span> <span class="truncate">${c.nome}</span></h2>
+                    <button onclick="voltarView()" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/5 hover:bg-blue-500/10 flex items-center justify-center transition text-lg sm:text-xl flex-shrink-0"><i class="fas fa-arrow-left"></i></button>
+                    <div class="flex-1 min-w-0">
+                        <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest opacity-50 block truncate">Caderno</span>
+                        <h2 class="text-xl sm:text-2xl md:text-3xl font-black flex items-center gap-2 sm:gap-3 truncate w-full" title="${c.nome}">
+                            <span class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full flex-shrink-0" style="background-color: ${c.cor || '#3b82f6'}"></span> 
+                            <span class="truncate">${c.nome}</span>
+                        </h2>
                     </div>
                 `;
                 navText.innerText = "Nova Disciplina";
                 navBtn.onclick = () => addDisciplina(c.id);
 
                 if (c.disciplinas.length === 0) {
-                    grid.innerHTML = `<div class="col-span-full py-20 text-center opacity-40"><i class="fas fa-layer-group text-6xl mb-4"></i><h3 class="text-xl font-bold">Sem disciplinas.</h3><p>Adicione matérias a este caderno.</p></div>`;
-                    return;
+                    grid.innerHTML = `<div class="col-span-full py-20 text-center opacity-40"><i class="fas fa-layer-group text-6xl mb-4"></i><h3 class="text-xl font-bold">Sem disciplinas.</h3><p>Adicione matérias a este caderno.</p></div>`; return;
                 }
 
                 grid.innerHTML = c.disciplinas.map(d => `
-                    <div onclick="abrirDisciplina(${d.id})" class="drill-card custom-card rounded-3xl p-6 shadow-md border-l-4 h-36 flex flex-col justify-center relative" style="border-left-color: ${c.cor || '#3b82f6'}">
-                        <h3 class="font-black text-xl break-words pr-12 line-clamp-2 leading-tight" title="${d.nome}">${d.nome}</h3>
-                        <span class="text-[10px] font-black uppercase opacity-50 mt-2 tracking-widest">${d.unidades.length} UNIDADES</span>
-                        <div class="absolute top-4 right-4 flex gap-1">
-                            <button onclick="event.stopPropagation(); renomearItem('disciplina', ${c.id}, ${d.id})" class="w-8 h-8 rounded-full bg-black/5 hover:bg-blue-500/20 text-inherit flex items-center justify-center transition"><i class="fas fa-pen text-[10px]"></i></button>
-                            <button onclick="event.stopPropagation(); solicitarExclusao('disciplina', ${c.id}, ${d.id})" class="w-8 h-8 rounded-full bg-black/5 hover:bg-red-500/20 text-red-500 flex items-center justify-center transition"><i class="fas fa-times text-[10px]"></i></button>
+                    <div onclick="abrirDisciplina(${d.id})" class="drill-card custom-card rounded-3xl p-5 sm:p-6 shadow-md border-l-4 h-auto min-h-[8rem] flex flex-col justify-center relative w-full" style="border-left-color: ${c.cor || '#3b82f6'}">
+                        <h3 class="font-black text-lg sm:text-xl break-words pr-12 line-clamp-3 leading-tight" title="${d.nome}">${d.nome}</h3>
+                        <span class="text-[9px] sm:text-[10px] font-black uppercase opacity-50 mt-2 tracking-widest truncate">${d.unidades.length} UNIDADES</span>
+                        <div class="absolute top-3 right-3 flex gap-1">
+                            <button onclick="event.stopPropagation(); renomearItem('disciplina', ${c.id}, ${d.id})" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black/5 hover:bg-blue-500/20 text-inherit flex items-center justify-center transition"><i class="fas fa-pen text-[10px]"></i></button>
+                            <button onclick="event.stopPropagation(); solicitarExclusao('disciplina', ${c.id}, ${d.id})" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black/5 hover:bg-red-500/20 text-red-500 flex items-center justify-center transition"><i class="fas fa-times text-[10px]"></i></button>
                         </div>
                     </div>
                 `).join('');
@@ -285,106 +334,76 @@
                 if(!d) return irParaCadernos();
 
                 header.innerHTML = `
-                    <button onclick="voltarView()" class="w-12 h-12 rounded-full bg-black/5 hover:bg-blue-500/10 flex items-center justify-center transition text-xl flex-shrink-0"><i class="fas fa-arrow-left"></i></button>
-                    <div class="flex-1 min-w-0">
-                        <span class="text-[10px] font-black uppercase tracking-widest opacity-50 truncate block">Disciplina: ${c.nome}</span>
-                        <h2 class="text-2xl md:text-3xl font-black truncate" title="${d.nome}">${d.nome}</h2>
+                    <button onclick="voltarView()" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/5 hover:bg-blue-500/10 flex items-center justify-center transition text-lg sm:text-xl flex-shrink-0"><i class="fas fa-arrow-left"></i></button>
+                    <div class="flex-1 min-w-0 w-full">
+                        <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest opacity-50 truncate block w-full">Disciplina: ${c.nome}</span>
+                        <h2 class="text-xl sm:text-2xl md:text-3xl font-black truncate w-full" title="${d.nome}">${d.nome}</h2>
                     </div>
                 `;
                 navText.innerText = "Nova Unidade";
                 navBtn.onclick = () => addUnidade(c.id, d.id);
 
                 if (d.unidades.length === 0) {
-                    grid.innerHTML = `<div class="col-span-full py-20 text-center opacity-40"><i class="far fa-folder-open text-6xl mb-4"></i><h3 class="text-xl font-bold">Sem unidades.</h3><p>Crie assuntos para adicionar questões.</p></div>`;
-                    return;
+                    grid.innerHTML = `<div class="col-span-full py-20 text-center opacity-40"><i class="far fa-folder-open text-6xl mb-4"></i><h3 class="text-xl font-bold">Sem unidades.</h3><p>Crie assuntos para adicionar questões.</p></div>`; return;
                 }
 
                 grid.innerHTML = d.unidades.map(u => `
-                    <div onclick="abrirModalQuestoes(${c.id}, ${d.id}, ${u.id}, '${u.nome}')" class="drill-card custom-card rounded-2xl p-5 shadow-sm flex items-center justify-between group">
-                        <div class="flex items-center gap-4 flex-1 pr-2">
-                            <div class="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center text-inherit flex-shrink-0"><i class="fas fa-file-alt"></i></div>
-                            <h3 class="font-bold text-lg break-words line-clamp-2 leading-tight" title="${u.nome}">${u.nome}</h3>
+                    <div onclick="abrirModalQuestoes(${c.id}, ${d.id}, ${u.id}, '${u.nome}')" class="drill-card custom-card rounded-2xl p-4 sm:p-5 shadow-sm flex items-center justify-between group w-full">
+                        <div class="flex items-center gap-3 sm:gap-4 flex-1 pr-2 min-w-0">
+                            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/5 flex items-center justify-center text-inherit flex-shrink-0"><i class="fas fa-file-alt text-xs sm:text-base"></i></div>
+                            <h3 class="font-bold text-base sm:text-lg break-words line-clamp-2 leading-tight" title="${u.nome}">${u.nome}</h3>
                         </div>
-                        <div class="flex items-center gap-1 sm:gap-3 flex-shrink-0">
-                            <button onclick="event.stopPropagation(); renomearItem('unidade', ${c.id}, ${d.id}, ${u.id})" class="opacity-60 hover:opacity-100 w-8 h-8 rounded-full hover:bg-blue-500/20 text-inherit transition"><i class="fas fa-pen text-xs"></i></button>
-                            <button onclick="event.stopPropagation(); solicitarExclusao('unidade', ${c.id}, ${d.id}, ${u.id})" class="opacity-60 hover:opacity-100 w-8 h-8 rounded-full hover:bg-red-500/20 text-red-500 transition"><i class="fas fa-trash text-xs"></i></button>
-                            <span class="text-[10px] text-white px-3 py-1 rounded-full font-black ml-1 sm:ml-2" style="background-color: ${c.cor || '#3b82f6'}">${u.questoes.length} Qs</span>
+                        <div class="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+                            <button onclick="event.stopPropagation(); renomearItem('unidade', ${c.id}, ${d.id}, ${u.id})" class="opacity-60 hover:opacity-100 w-7 h-7 sm:w-8 sm:h-8 rounded-full hover:bg-blue-500/20 text-inherit transition"><i class="fas fa-pen text-[10px] sm:text-xs"></i></button>
+                            <button onclick="event.stopPropagation(); solicitarExclusao('unidade', ${c.id}, ${d.id}, ${u.id})" class="opacity-60 hover:opacity-100 w-7 h-7 sm:w-8 sm:h-8 rounded-full hover:bg-red-500/20 text-red-500 transition"><i class="fas fa-trash text-[10px] sm:text-xs"></i></button>
+                            <span class="text-[9px] sm:text-[10px] text-white px-2 sm:px-3 py-1 rounded-full font-black ml-1" style="background-color: ${c.cor || '#3b82f6'}">${u.questoes.length} Qs</span>
                         </div>
                     </div>
                 `).join('');
             }
         }
 
-        // --- CRUD ESTRUTURA ---
-        function criarCaderno() { const n = prompt("Nome do Caderno:"); if(n) { db.cadernos.push({id: Date.now(), nome: n, disciplinas: [], cor: '#3b82f6'}); salvar(); render(); } }
-        function addDisciplina(cId) { const n = prompt("Nome da Disciplina:"); if(n) { db.cadernos.find(c => c.id === cId).disciplinas.push({id: Date.now(), nome: n, unidades: []}); salvar(); render(); } }
-        function addUnidade(cId, dId) { const n = prompt("Nome da Unidade:"); if(n) { db.cadernos.find(c => c.id === cId).disciplinas.find(d => d.id === dId).unidades.push({id: Date.now(), nome: n, questoes: [], anotacoes: ""}); salvar(); render(); } }
+        // --- CRUD BÁSICO ---
+        function criarCaderno() { abrirInputModal("Criar Caderno", "Nome...", "", (n) => { if(n && n.trim()!=="") { db.cadernos.push({id: Date.now(), nome: n.trim(), disciplinas: [], cor: '#3b82f6'}); salvar(); render(); } }); }
+        function addDisciplina(cId) { abrirInputModal("Nova Disciplina", "Nome...", "", (n) => { if(n && n.trim()!=="") { db.cadernos.find(c => c.id === cId).disciplinas.push({id: Date.now(), nome: n.trim(), unidades: []}); salvar(); render(); } }); }
+        function addUnidade(cId, dId) { abrirInputModal("Nova Unidade", "Nome...", "", (n) => { if(n && n.trim()!=="") { db.cadernos.find(c => c.id === cId).disciplinas.find(d => d.id === dId).unidades.push({id: Date.now(), nome: n.trim(), questoes: [], anotacoes: ""}); salvar(); render(); } }); }
         function aplicarCor(cor) { db.cadernos.find(c => c.id === activeColorTarget).cor = cor; salvar(); render(); document.getElementById('modal-cores').style.display='none'; }
-        function renomearItem(tipo, cId, dId, uId) { let item; if(tipo === 'caderno') item = db.cadernos.find(c => c.id === cId); else if(tipo === 'disciplina') item = db.cadernos.find(x => x.id === cId).disciplinas.find(d => d.id === dId); else if(tipo === 'unidade') item = db.cadernos.find(x => x.id === cId).disciplinas.find(x => x.id === dId).unidades.find(u => u.id === uId); const n = prompt(`Novo nome (${tipo}):`, item.nome); if(n) { item.nome = n; salvar(); render(); } }
+        
+        function renomearItem(tipo, cId, dId, uId) { 
+            let item; if(tipo === 'caderno') item = db.cadernos.find(c => c.id === cId); else if(tipo === 'disciplina') item = db.cadernos.find(x => x.id === cId).disciplinas.find(d => d.id === dId); else if(tipo === 'unidade') item = db.cadernos.find(x => x.id === cId).disciplinas.find(x => x.id === dId).unidades.find(u => u.id === uId); 
+            abrirInputModal(`Renomear ${tipo}`, `Novo nome...`, item.nome, (n) => { if(n && n.trim() !== "") { item.nome = n.trim(); salvar(); render(); } });
+        }
 
-        function solicitarExclusao(tipo, cId, dId, uId, qIdx) { deleteQueue = {tipo, cId, dId, uId, qIdx}; document.getElementById('confirm-overlay').classList.remove('hidden'); document.getElementById('confirm-overlay').classList.add('flex'); setTimeout(() => document.getElementById('confirm-box').classList.add('show'), 10); document.getElementById('confirm-text').innerText = `Isso apagará este(a) ${tipo} e tudo que estiver dentro.`; document.getElementById('btn-confirmar-acao').onclick = executarExclusao; }
+        function solicitarExclusao(tipo, cId, dId, uId, qIdx) { deleteQueue = {tipo, cId, dId, uId, qIdx}; document.getElementById('confirm-overlay').classList.remove('hidden'); document.getElementById('confirm-overlay').classList.add('flex'); setTimeout(() => document.getElementById('confirm-box').classList.add('show'), 10); document.getElementById('confirm-text').innerText = `Isto irá apagar permanentemente.`; document.getElementById('btn-confirmar-acao').onclick = executarExclusao; }
         function cancelarExclusao() { document.getElementById('confirm-box').classList.remove('show'); setTimeout(() => document.getElementById('confirm-overlay').classList.add('hidden'), 200); }
         function executarExclusao() { const {tipo, cId, dId, uId, qIdx} = deleteQueue; if(tipo === 'caderno') { db.cadernos = db.cadernos.filter(c => c.id !== cId); if(activeIds.cId === cId) irParaCadernos(); } else if(tipo === 'disciplina') { const c = db.cadernos.find(x => x.id === cId); c.disciplinas = c.disciplinas.filter(d => d.id !== dId); if(activeIds.dId === dId) voltarView(); } else if(tipo === 'unidade') { const d = db.cadernos.find(x => x.id === cId).disciplinas.find(x => x.id === dId); d.unidades = d.unidades.filter(u => u.id !== uId); } else if(tipo === 'questao') { const u = db.cadernos.find(x => x.id === cId).disciplinas.find(x => x.id === dId).unidades.find(x => x.id === uId); u.questoes.splice(qIdx, 1); renderQuestoesEditor(); } salvar(); render(); cancelarExclusao(); }
 
-        // --- GESTÃO DE BACKUP E IMPORTAÇÃO INTELIGENTE (COM CORREÇÃO DE IDS) ---
+        // --- BACKUP & EXPORT/IMPORT ---
         function exportarTudo() { const b = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `backup_studynt.json`; a.click(); }
-        
         function gerarIdUnico() { return Date.now() + Math.floor(Math.random() * 100000); }
-        
-        function renovarIds(caderno) {
-            caderno.id = gerarIdUnico(); // Gera ID único pro Caderno
-            if(caderno.disciplinas) {
-                caderno.disciplinas.forEach(d => {
-                    d.id = gerarIdUnico(); // Gera ID único pra Disciplina
-                    if(d.unidades) {
-                        d.unidades.forEach(u => {
-                            u.id = gerarIdUnico(); // Gera ID único pra Unidade
-                        });
-                    }
-                });
-            }
-            return caderno;
-        }
+        function renovarIds(caderno) { caderno.id = gerarIdUnico(); if(caderno.disciplinas) { caderno.disciplinas.forEach(d => { d.id = gerarIdUnico(); if(d.unidades) { d.unidades.forEach(u => { u.id = gerarIdUnico(); }); } }); } return caderno; }
+        function importarSmart(e) { const r = new FileReader(); r.onload = (ev) => { try { const imp = JSON.parse(ev.target.result); let novosCadernos = []; if(imp.cadernos) novosCadernos = imp.cadernos; else if(Array.isArray(imp)) novosCadernos = imp; novosCadernos = novosCadernos.map(c => renovarIds(c)); db.cadernos = [...db.cadernos, ...novosCadernos]; salvar(); render(); alert("Estudos importados com sucesso!"); } catch(e) { alert("Erro ao importar o arquivo!"); } }; r.readAsText(e.target.files[0]); }
 
-        function importarSmart(e) { 
-            const r = new FileReader(); 
-            r.onload = (ev) => { 
-                try { 
-                    const imp = JSON.parse(ev.target.result); 
-                    let novosCadernos = [];
-                    if(imp.cadernos) novosCadernos = imp.cadernos; 
-                    else if(Array.isArray(imp)) novosCadernos = imp; 
-                    
-                    // Aplica IDs totalmente novos para evitar que se apague clones ao mesmo tempo
-                    novosCadernos = novosCadernos.map(c => renovarIds(c));
-                    
-                    db.cadernos = [...db.cadernos, ...novosCadernos]; 
-                    salvar(); render(); alert("Estudos importados com sucesso!"); 
-                } catch(e) { alert("Erro ao importar o arquivo!"); } 
-            }; 
-            r.readAsText(e.target.files[0]); 
-        }
-
-        // --- EDITOR DE QUESTÕES E ANOTAÇÕES ---
+        // --- EDITOR DE UNIDADE ---
         function abrirModalQuestoes(cId, dId, uId, nome) { activeIds.uId = uId; const u = db.cadernos.find(c => c.id === cId).disciplinas.find(d => d.id === dId).unidades.find(x => x.id === uId); document.getElementById('modal-subtitle').innerText = nome; document.getElementById('texto-anotacoes').value = u.anotacoes || ''; document.getElementById('modal-questoes').style.display = 'flex'; setTab('questoes'); renderQuestoesEditor(); }
         function fecharModalQuestoes() { document.getElementById('modal-questoes').style.display = 'none'; activeIds.uId = null; render(); }
-        function setTab(tab) { activeTab = tab; document.getElementById('tab-questoes').className = `pb-3 text-sm font-bold ${tab==='questoes'?'tab-active':'opacity-50'}`; document.getElementById('tab-anotacoes').className = `pb-3 text-sm font-bold ${tab==='anotacoes'?'tab-active':'opacity-50'}`; document.getElementById('aba-questoes-content').classList.toggle('hidden', tab!=='questoes'); document.getElementById('aba-anotacoes-content').classList.toggle('hidden', tab!=='anotacoes'); document.getElementById('footer-modal').classList.toggle('hidden', tab!=='questoes'); }
+        function setTab(tab) { activeTab = tab; document.getElementById('tab-questoes').className = `pb-3 text-xs sm:text-sm font-bold flex-shrink-0 transition-all ${tab==='questoes'?'tab-active':'opacity-50'}`; document.getElementById('tab-anotacoes').className = `pb-3 text-xs sm:text-sm font-bold flex-shrink-0 transition-all ${tab==='anotacoes'?'tab-active':'opacity-50'}`; document.getElementById('aba-questoes-content').classList.toggle('hidden', tab!=='questoes'); document.getElementById('aba-anotacoes-content').classList.toggle('hidden', tab!=='anotacoes'); document.getElementById('footer-modal').classList.toggle('hidden', tab!=='questoes'); }
         function salvarAnotacaoDirect() { const u = db.cadernos.find(x => x.id === activeIds.cId).disciplinas.find(x => x.id === activeIds.dId).unidades.find(x => x.id === activeIds.uId); u.anotacoes = document.getElementById('texto-anotacoes').value; salvar(); }
         function adicionarQuestao() { const u = db.cadernos.find(x => x.id === activeIds.cId).disciplinas.find(x => x.id === activeIds.dId).unidades.find(x => x.id === activeIds.uId); u.questoes.push({ pergunta: "", respostas: ["", "", "", ""], correta: 0 }); renderQuestoesEditor(); }
         
         function renderQuestoesEditor() {
             const u = db.cadernos.find(c => c.id === activeIds.cId).disciplinas.find(d => d.id === activeIds.dId).unidades.find(x => x.id === activeIds.uId);
             const list = document.getElementById('aba-questoes-content');
-            if (u.questoes.length === 0) { list.innerHTML = `<div class="py-12 text-center opacity-30"><p class="font-bold">Sem questões.</p></div>`; return; }
+            if (u.questoes.length === 0) { list.innerHTML = `<div class="py-12 text-center opacity-30 w-full"><p class="font-bold">Sem questões.</p></div>`; return; }
             list.innerHTML = u.questoes.map((q, idx) => `
-                <div class="bg-black/5 rounded-3xl p-6 border border-inherit relative group">
-                    <button onclick="solicitarExclusao('questao', ${activeIds.cId}, ${activeIds.dId}, ${activeIds.uId}, ${idx})" class="absolute top-4 right-4 text-red-500 opacity-60 hover:opacity-100 transition p-2"><i class="fas fa-trash"></i></button>
-                    <textarea onchange="atualizarQ(${idx}, 'pergunta', this.value)" placeholder="Pergunta..." class="custom-input w-full p-4 rounded-xl mb-4 h-24 text-sm font-bold outline-none focus:ring-2 border-transparent focus:border-blue-500 transition">${q.pergunta}</textarea>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div class="bg-black/5 rounded-3xl p-4 sm:p-6 border border-inherit relative group w-full">
+                    <button onclick="solicitarExclusao('questao', ${activeIds.cId}, ${activeIds.dId}, ${activeIds.uId}, ${idx})" class="absolute top-2 right-2 sm:top-4 sm:right-4 text-red-500 opacity-60 hover:opacity-100 transition p-2"><i class="fas fa-trash"></i></button>
+                    <textarea onchange="atualizarQ(${idx}, 'pergunta', this.value)" placeholder="Pergunta..." class="custom-input w-full p-3 sm:p-4 rounded-xl mb-4 h-20 sm:h-24 text-sm font-bold outline-none focus:ring-2 border-transparent focus:border-blue-500 transition min-w-0 resize-none">${q.pergunta}</textarea>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 w-full">
                         ${q.respostas.map((r, rIdx) => `
-                            <div class="flex items-center gap-3 p-2 bg-white/5 rounded-xl border border-inherit">
-                                <input type="radio" name="correct_${idx}" ${q.correta == rIdx ? 'checked' : ''} onchange="atualizarQ(${idx}, 'correta', ${rIdx})" class="w-4 h-4 accent-blue-600">
-                                <input type="text" value="${r}" placeholder="Resposta..." onchange="atualizarResp(${idx}, ${rIdx}, this.value)" class="bg-transparent flex-1 text-sm outline-none font-medium">
+                            <div class="flex items-center gap-2 sm:gap-3 p-2 bg-white/5 rounded-xl border border-inherit min-w-0">
+                                <input type="radio" name="correct_${idx}" ${q.correta == rIdx ? 'checked' : ''} onchange="atualizarQ(${idx}, 'correta', ${rIdx})" class="w-4 h-4 accent-blue-600 flex-shrink-0">
+                                <input type="text" value="${r}" placeholder="Resposta..." onchange="atualizarResp(${idx}, ${rIdx}, this.value)" class="bg-transparent flex-1 text-sm outline-none font-medium min-w-0 w-full">
                             </div>
                         `).join('')}
                     </div>
@@ -394,7 +413,7 @@
         function atualizarQ(idx, c, v) { const u = db.cadernos.find(x => x.id === activeIds.cId).disciplinas.find(x => x.id === activeIds.dId).unidades.find(x => x.id === activeIds.uId); u.questoes[idx][c] = v; salvar(); }
         function atualizarResp(qIdx, rIdx, v) { const u = db.cadernos.find(x => x.id === activeIds.cId).disciplinas.find(x => x.id === activeIds.dId).unidades.find(x => x.id === activeIds.uId); u.questoes[qIdx].respostas[rIdx] = v; salvar(); }
 
-        // --- SISTEMA DE QUIZ ---
+        // --- SISTEMA DE QUIZ GAME ---
         function abrirSetupQuiz() { if(db.cadernos.length === 0) return alert("Crie algo primeiro!"); document.getElementById('modal-setup-quiz').classList.remove('hidden'); document.getElementById('modal-setup-quiz').classList.add('flex'); atualizarFiltrosQuiz(0); }
         function fecharSetupQuiz() { document.getElementById('modal-setup-quiz').classList.add('hidden'); document.getElementById('modal-setup-quiz').classList.remove('flex'); }
         function atualizarFiltrosQuiz(step) {
@@ -409,74 +428,29 @@
             cList.forEach(c => { const dList = vDisc === "ALL" ? c.disciplinas : c.disciplinas.filter(d => d.id == vDisc); dList.forEach(d => { const uList = vUnid === "ALL" ? d.unidades : d.unidades.filter(u => u.id == vUnid); uList.forEach(u => { u.questoes.forEach(q => { if(q.pergunta) filtered.push({...q, fonte: `${c.nome} > ${d.nome}`}); }); }); }); });
             if(filtered.length === 0) return alert("Nenhuma questão encontrada nesta seleção!");
             currentQuizData = filtered.sort(() => Math.random() - 0.5); activeQuizIndex = 0; scoreQuiz = 0;
-            fecharSetupQuiz(); document.getElementById('modal-play-quiz').classList.add('flex'); carregarQuestaoQuiz();
+            fecharSetupQuiz(); document.getElementById('modal-play-quiz').classList.remove('hidden'); document.getElementById('modal-play-quiz').classList.add('flex'); carregarQuestaoQuiz();
         }
-        function carregarQuestaoQuiz() { document.getElementById('quiz-feedback-container').classList.add('hidden'); const q = currentQuizData[activeQuizIndex]; document.getElementById('quiz-progress-text').innerText = `${activeQuizIndex + 1} / ${currentQuizData.length}`; document.getElementById('quiz-progress-bar').style.width = `${((activeQuizIndex) / currentQuizData.length) * 100}%`; document.getElementById('quiz-source').innerText = q.fonte; document.getElementById('quiz-pergunta').innerText = q.pergunta; document.getElementById('quiz-opcoes').innerHTML = q.respostas.map((r, i) => r ? `<button onclick="checarRespostaQuiz(${i}, this)" class="quiz-btn-opt w-full text-left p-5 rounded-2xl bg-slate-800 border-2 border-transparent transition-all">${r}</button>` : '').join(''); }
+        function carregarQuestaoQuiz() { document.getElementById('quiz-feedback-container').classList.add('hidden'); const q = currentQuizData[activeQuizIndex]; document.getElementById('quiz-progress-text').innerText = `${activeQuizIndex + 1} / ${currentQuizData.length}`; document.getElementById('quiz-progress-bar').style.width = `${((activeQuizIndex) / currentQuizData.length) * 100}%`; document.getElementById('quiz-source').innerText = q.fonte; document.getElementById('quiz-pergunta').innerText = q.pergunta; document.getElementById('quiz-opcoes').innerHTML = q.respostas.map((r, i) => r ? `<button onclick="checarRespostaQuiz(${i}, this)" class="quiz-btn-opt w-full text-left p-4 sm:p-5 rounded-2xl bg-slate-800 border-2 border-transparent transition-all break-words min-w-0">${r}</button>` : '').join(''); }
         function checarRespostaQuiz(idx, btn) { const q = currentQuizData[activeQuizIndex]; const correct = idx == q.correta; document.querySelectorAll('.quiz-btn-opt').forEach(b => b.disabled = true); if(correct) { btn.classList.add('bg-green-600/20', 'border-green-500', 'text-green-400'); scoreQuiz++; } else { btn.classList.add('bg-red-600/20', 'border-red-500', 'text-red-400'); document.querySelectorAll('.quiz-btn-opt')[q.correta].classList.add('border-green-500', 'text-green-500'); } document.getElementById('quiz-feedback-container').classList.remove('hidden'); document.getElementById('quiz-feedback-msg').innerHTML = correct ? "Correto!" : "Incorreto!"; }
-        function proximaQuestaoQuiz() { activeQuizIndex++; if(activeQuizIndex < currentQuizData.length) carregarQuestaoQuiz(); else { document.getElementById('modal-play-quiz').classList.remove('flex'); document.getElementById('modal-result-quiz').classList.add('flex'); document.getElementById('result-score').innerText = Math.round((scoreQuiz/currentQuizData.length)*100) + "%"; document.getElementById('result-text').innerText = `${scoreQuiz} acertos de ${currentQuizData.length}`; } }
-        function fecharPlayQuiz() { document.getElementById('modal-play-quiz').classList.remove('flex'); }
-        function fecharResultQuiz() { document.getElementById('modal-result-quiz').classList.remove('flex'); }
+        function proximaQuestaoQuiz() { activeQuizIndex++; if(activeQuizIndex < currentQuizData.length) carregarQuestaoQuiz(); else { document.getElementById('modal-play-quiz').classList.add('hidden'); document.getElementById('modal-play-quiz').classList.remove('flex'); document.getElementById('modal-result-quiz').classList.remove('hidden'); document.getElementById('modal-result-quiz').classList.add('flex'); document.getElementById('result-score').innerText = Math.round((scoreQuiz/currentQuizData.length)*100) + "%"; document.getElementById('result-text').innerText = `${scoreQuiz} acertos de ${currentQuizData.length}`; } }
+        function fecharPlayQuiz() { document.getElementById('modal-play-quiz').classList.add('hidden'); document.getElementById('modal-play-quiz').classList.remove('flex'); }
+        function fecharResultQuiz() { document.getElementById('modal-result-quiz').classList.add('hidden'); document.getElementById('modal-result-quiz').classList.remove('flex'); }
 
-        // --- SISTEMA DE SEGURANÇA REVISADO (PIN E TELA) ---
+        // --- SISTEMA DE SEGURANÇA E BLOQUEIO ---
         function atualizarMenuBloqueio() { const isLocked = localStorage.getItem('studyflow_locked') === 'true'; const container = document.getElementById('lock-menu-container'); container.innerHTML = isLocked ? `<button onclick="toggleLock()" class="w-full text-left px-3 py-2.5 text-sm text-red-500 hover:bg-red-500/10 rounded-xl font-bold"><i class="fas fa-lock-open w-5"></i> Remover Bloqueio</button>` : `<button onclick="toggleLock()" class="w-full text-left px-3 py-2.5 text-sm text-slate-500 hover:bg-slate-500/10 rounded-xl font-bold"><i class="fas fa-lock w-5"></i> Ativar Bloqueio</button>`; }
         function verificarBloqueioInicial() { 
             atualizarMenuBloqueio(); 
             if (localStorage.getItem('studyflow_locked') === 'true') { 
-                document.getElementById('lock-screen').classList.remove('hidden'); 
-                document.getElementById('lock-screen').classList.add('flex'); 
-                document.getElementById('app-content').classList.add('blur-lock'); 
+                document.getElementById('lock-screen').classList.remove('hidden'); document.getElementById('lock-screen').classList.add('flex'); document.getElementById('app-content').classList.add('blur-lock'); 
             } else {
-                document.getElementById('lock-screen').classList.remove('flex'); 
-                document.getElementById('lock-screen').classList.add('hidden'); 
-                document.getElementById('app-content').classList.remove('blur-lock'); 
+                document.getElementById('lock-screen').classList.remove('flex'); document.getElementById('lock-screen').classList.add('hidden'); document.getElementById('app-content').classList.remove('blur-lock'); 
             } 
         }
-        
-        function toggleLock() { 
-            document.getElementById('config-menu').classList.remove('open'); 
-            if (localStorage.getItem('studyflow_locked') === 'true') { 
-                autenticarUsuario("Digite o PIN para destravar o app", (sucesso) => { 
-                    if(sucesso) { localStorage.removeItem('studyflow_locked'); localStorage.removeItem('studyflow_pin'); alert("Segurança Removida!"); atualizarMenuBloqueio(); } 
-                }); 
-            } else { 
-                abrirPinModal("Criar Senha", "Crie um PIN (4 a 6 números).", true, (senha) => { 
-                    if(senha && senha.trim() !== '') { localStorage.setItem('studyflow_pin', senha); finalizarAtivacao(); } 
-                }); 
-            } 
-        }
-        
+        function toggleLock() { document.getElementById('config-menu').classList.remove('open'); if (localStorage.getItem('studyflow_locked') === 'true') { autenticarUsuario("Digite o PIN para destravar", (sucesso) => { if(sucesso) { localStorage.removeItem('studyflow_locked'); localStorage.removeItem('studyflow_pin'); alert("Segurança Removida!"); atualizarMenuBloqueio(); } }); } else { abrirPinModal("Criar Senha", "Crie um PIN.", true, (senha) => { if(senha && senha.trim() !== '') { localStorage.setItem('studyflow_pin', senha); finalizarAtivacao(); } }); } }
         function finalizarAtivacao() { localStorage.setItem('studyflow_locked', 'true'); alert("Estudos Protegidos! Um PIN será exigido."); atualizarMenuBloqueio(); }
-        
-        function desbloquearApp() { 
-            autenticarUsuario("Autenticação Necessária", (s) => { 
-                if(s) { 
-                    document.getElementById('lock-screen').classList.remove('flex'); 
-                    document.getElementById('lock-screen').classList.add('hidden'); 
-                    document.getElementById('app-content').classList.remove('blur-lock'); 
-                } 
-            }); 
-        }
-        
-        function autenticarUsuario(msg, cb) { 
-            const hp = localStorage.getItem('studyflow_pin'); 
-            if(hp) {
-                abrirPinModal("Autenticação", msg, false, (s) => { if(s===hp) cb(true); else { alert("Senha incorreta!"); cb(false); } }); 
-            } else {
-                cb(true); 
-            }
-        }
-        
-        function abrirPinModal(t, d, ic, cb) { 
-            document.getElementById('pin-title').innerText=t; 
-            document.getElementById('pin-desc').innerText=d; 
-            document.getElementById('pin-input').value=''; 
-            document.getElementById('pin-modal').classList.remove('hidden'); 
-            document.getElementById('pin-modal').classList.add('flex'); 
-            document.getElementById('btn-cancel-pin').classList.toggle('hidden', !ic); 
-            document.getElementById('pin-input').focus(); 
-            pinCallback=cb; 
-        }
-        
+        function desbloquearApp() { autenticarUsuario("Autenticação Necessária", (s) => { if(s) { document.getElementById('lock-screen').classList.remove('flex'); document.getElementById('lock-screen').classList.add('hidden'); document.getElementById('app-content').classList.remove('blur-lock'); } }); }
+        function autenticarUsuario(msg, cb) { const hp = localStorage.getItem('studyflow_pin'); if(hp) { abrirPinModal("Autenticação", msg, false, (s) => { if(s===hp) cb(true); else { alert("Senha incorreta!"); cb(false); } }); } else { cb(true); } }
+        function abrirPinModal(t, d, ic, cb) { document.getElementById('pin-title').innerText=t; document.getElementById('pin-desc').innerText=d; document.getElementById('pin-input').value=''; document.getElementById('pin-modal').classList.remove('hidden'); document.getElementById('pin-modal').classList.add('flex'); document.getElementById('btn-cancel-pin').classList.toggle('hidden', !ic); document.getElementById('pin-input').focus(); pinCallback=cb; }
         function fecharPin() { document.getElementById('pin-modal').classList.add('hidden'); document.getElementById('pin-modal').classList.remove('flex'); if(pinCallback) pinCallback(null); pinCallback = null; }
         function processarPin() { const v = document.getElementById('pin-input').value; document.getElementById('pin-modal').classList.add('hidden'); document.getElementById('pin-modal').classList.remove('flex'); if(pinCallback) pinCallback(v); pinCallback = null; }
 
